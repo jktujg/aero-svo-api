@@ -1,0 +1,9 @@
+.idea/
+dist/
+*~*
+__pycache__
+_[!_]*
+*.swp
+*.ipynb
+*.egg-info*
+
