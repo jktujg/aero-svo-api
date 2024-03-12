@@ -110,7 +110,7 @@ class Flight(Base):
     prb: datetime | None = Field(None, alias='t_prb')
     # status
     status_id: int | None = None
-    staus_code: int | None = None
+    status_code: int | None = None
 
     @field_validator('direction', mode='before')
     @classmethod
