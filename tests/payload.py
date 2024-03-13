@@ -48,7 +48,7 @@ class CompanyPayload(Payload):
 class FlightPayload(Payload):
     i_id: str = '8770878'
     ad: str = 'A'
-    flt: str = '556'
+    flt: str = '556D'
     dat: str = '2023-12-19T00:00:00+03:00'
     mar1: AirportPayload = AirportPayload()
     mar2: AirportPayload = AirportPayload()

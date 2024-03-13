@@ -67,7 +67,7 @@ class Flight(Base):
     id: int = Field(alias='i_id')
     direction: Literal['arrival', 'departure'] = Field(alias='ad')
     company: Company = Field(alias='co')
-    number: int = Field(alias='flt')
+    number: str = Field(alias='flt')
     date: datetime = Field(alias='dat')
     mar1: Airport
     mar2: Airport
