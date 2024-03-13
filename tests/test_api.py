@@ -28,6 +28,14 @@ class TestAsyncSvoApi(IsolatedAsyncioTestCase):
         response = await self.api.get_flight(flight_id=12345, _session=mock_session)
         mock_session.get.assert_called()
 
+    async def test_session_injection_does_not_create_session(self):
+        api = AsyncSvoApi()
+        mock_session = AsyncMock(get=AsyncMock(return_value=AsyncMock(raise_for_status=Mock)))
+
+        response = await api._request(urls.timetable, params={}, _session=mock_session)
+
+        self.assertIsNone(api._session)
+
     async def test_context_manager(self):
         async with AsyncSvoApi() as api:
             self.assertFalse(api.session.closed)

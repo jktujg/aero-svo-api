@@ -4,6 +4,7 @@ from typing import Literal, Any
 from aiohttp import ClientSession
 from datetime import datetime
 from logging import getLogger
+from functools import cached_property
 
 from . import (
     urls,
@@ -16,10 +17,12 @@ svo_logger = getLogger('svo-api')
 
 class AsyncSvoApi:
     def __init__(self, session: ClientSession | None = None) -> None:
-        self._session = session or ClientSession()
+        self._session = session
 
-    @property
+    @cached_property
     def session(self):
+        if self._session is None:
+            self._session = ClientSession()
         return self._session
 
     async def __aenter__(self):
