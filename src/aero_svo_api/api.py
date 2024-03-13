@@ -28,8 +28,8 @@ class AsyncSvoApi:
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         await self.session.close()
 
-    async def _request(self, url: str, params: dict, **kwargs: Any) -> dict:
-        response = await self.session.get(url, params=params, **kwargs)
+    async def _request(self, url: str, params: dict, _session: ClientSession | None = None, **kwargs: Any) -> dict:
+        response = await (_session or self.session).get(url, params=params, **kwargs)
         response.raise_for_status()
         return await response.json()
 

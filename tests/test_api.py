@@ -21,6 +21,13 @@ class TestAsyncSvoApi(IsolatedAsyncioTestCase):
         response = await self.api._request(urls.timetable, proxy='https://example.com', params={'param': 'val'})
         self.api.session.get.assert_called_with(urls.timetable, proxy='https://example.com', params={'param': 'val'})
 
+    async def test_request_inject_session(self):
+        json_mock = AsyncMock(return_value=payload.FlightPayload().model_dump())
+        mock_session = AsyncMock(get=AsyncMock(return_value=Mock(json=json_mock)))
+
+        response = await self.api.get_flight(flight_id=12345, _session=mock_session)
+        mock_session.get.assert_called()
+
     async def test_context_manager(self):
         async with AsyncSvoApi() as api:
             self.assertFalse(api.session.closed)
