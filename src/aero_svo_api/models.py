@@ -78,6 +78,7 @@ class Flight(Base):
     main_id: int | None = Field(None, alias='main_flight')
     way_time: int
     # check-in
+    chin_id: str | None = None
     chin_start: datetime | None = Field(None, alias='t_chin_start')
     chin_end: datetime | None = Field(None, alias='t_chin_finish')
     chin_start_et: datetime | None = Field(None, alias='estimated_chin_start')
