@@ -82,13 +82,7 @@ class FlightPayload(Payload):
     t_at_mar: str = '2023-12-19T16:00:00+03:00'
     way_time: str = '693'
     t_otpr: str = '2023-12-19T18:55:00+03:00'
-    t_prb: str = ''
+    t_prb: str = '2023-12-19T18:55:00+03:00'
     term_gate: str = 'C'
     old_term_gate: str = 'C'
     aircraft_type_name: str = 'Boeing 777-300ER'
-
-
-
-
-
-
