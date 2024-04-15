@@ -85,7 +85,7 @@ class Flight(Base):
     chin_end_et: datetime | None = Field(None, alias='estimated_chin_finish')
     # boarding
     boarding_start: datetime | None = Field(None, alias='t_boarding_start')
-    boarding_end: datetime | None = Field(None, alias='t_boarding_finish')
+    boarding_end: datetime | None = Field(None, alias='t_bording_finish')           # typo in api
     gate_id: str | None = None
     gate_id_prev: str | None = Field(None, alias='old_gate_id')
     # terminal
