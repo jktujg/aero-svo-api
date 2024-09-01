@@ -1,4 +1,5 @@
-from src.aero_svo_api.api import AsyncSvoApi, svo_logger
+from src.aero_svo_api.api import AsyncSvoApi
+from logging import getLogger
 from src.aero_svo_api import urls
 from src.aero_svo_api import models
 from unittest import IsolatedAsyncioTestCase
@@ -6,6 +7,9 @@ from unittest.mock import AsyncMock, Mock
 from datetime import datetime, timedelta
 
 from . import payload
+
+
+svo_logger = getLogger('svo-api')
 
 
 class TestAsyncSvoApi(IsolatedAsyncioTestCase):

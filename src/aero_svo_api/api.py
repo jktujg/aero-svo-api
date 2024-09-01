@@ -1,9 +1,7 @@
 import urllib.parse
-import pydantic
 from typing import Literal, Any
 from aiohttp import ClientSession
 from datetime import datetime
-from logging import getLogger
 from functools import cached_property
 
 from . import (
@@ -12,7 +10,6 @@ from . import (
     utils,
 )
 
-svo_logger = getLogger('svo-api')
 
 
 class AsyncSvoApi:
@@ -58,15 +55,7 @@ class AsyncSvoApi:
             ),
             **kwargs,
         )
-
-        schedule = models.Schedule()
-
-        for item in response['items']:
-            try:
-                flight = models.Flight.model_validate(item)
-                schedule.flights.append(flight)
-            except pydantic.ValidationError as err:
-                svo_logger.warning(f'Skip flight id={item.get("i_id")}\n' + str(err))
+        schedule = models.Schedule.model_validate(response)
 
         return schedule
 

@@ -1,7 +1,12 @@
 from datetime import datetime
 from decimal import Decimal
+from logging import getLogger
 from typing import Annotated, Literal
-from pydantic import BaseModel, Field, model_validator, field_validator, AnyHttpUrl
+
+from pydantic import BaseModel, Field, model_validator, field_validator, AnyHttpUrl, ValidationError
+
+
+svo_logger = getLogger('svo-api')
 
 
 class Base(BaseModel):
@@ -138,3 +143,19 @@ class Flight(Base):
 
 class Schedule(Base):
     flights: list[Flight] = Field(default_factory=list, alias='items')
+
+    @model_validator(mode='before')
+    @classmethod
+    def _skip_invalid_flights(cls, data: dict) -> dict:
+        flights = []
+        for raw_flight in data['items']:
+            try:
+                valid_flight = Flight.model_validate(raw_flight)
+                flights.append(valid_flight)
+            except ValidationError as err:
+                flight_id = raw_flight.get('i_id')
+
+                extra = {'validation_errors': err.errors(), 'flight_id': flight_id}
+                svo_logger.warning(f'Skip flight id={flight_id}\n' + str(err), extra=extra)
+
+        return {'items': flights}
