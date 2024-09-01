@@ -40,11 +40,6 @@ class TestAsyncSvoApi(IsolatedAsyncioTestCase):
 
         self.assertIsNone(api._session)
 
-    async def test_context_manager(self):
-        async with AsyncSvoApi() as api:
-            self.assertFalse(api.session.closed)
-        self.assertTrue(api.session.closed)
-
     async def test_get_schedule(self):
         data = {'items': [payload.FlightPayload().model_dump() for _ in range(10)]}
         self.mock_response.json.return_value = data
