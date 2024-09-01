@@ -1,6 +1,7 @@
 import urllib.parse
 from typing import Literal, Any
 from aiohttp import ClientSession
+from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from functools import cached_property
 
@@ -11,8 +12,30 @@ from . import (
 )
 
 
+class BaseSvoAPI(metaclass=ABCMeta):
+    @abstractmethod
+    def get_schedule(self,
+                     direction: Literal['arrival', 'departure'],
+                     date_start: datetime,
+                     date_end: datetime,
+                     per_page: int = 99999,
+                     page: int = 0,
+                     locale: str = 'ru',
+                     raw_return: bool = False,
+                     **kwargs) -> models.Schedule | dict:
+        ...
 
-class AsyncSvoApi:
+    @abstractmethod
+    def get_flight(self,
+                   flight_id: int,
+                   locale: str = 'ru',
+                   raw_return: bool = False,
+                   **kwargs,
+                   ) -> models.Flight | dict:
+        ...
+
+
+class AsyncSvoApi(BaseSvoAPI):
     def __init__(self, session: ClientSession | None = None) -> None:
         self._session = session
 
