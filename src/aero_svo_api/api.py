@@ -63,8 +63,9 @@ class AsyncSvoApi(BaseSvoAPI):
                            per_page: int = 99999,
                            page: int = 0,
                            locale: str = 'ru',
+                           raw_return: bool = False,
                            **kwargs
-                           ) -> models.Schedule:
+                           ) -> models.Schedule | dict:
 
         response = await self._request(
             url=urls.timetable,
@@ -78,15 +79,14 @@ class AsyncSvoApi(BaseSvoAPI):
             ),
             **kwargs,
         )
-        schedule = models.Schedule.model_validate(response)
-
-        return schedule
+        return models.Schedule.model_validate(response) if raw_return is not True else response
 
     async def get_flight(self,
                          flight_id: int,
                          locale: str = 'ru',
+                         raw_return: bool = False,
                          **kwargs
-                         ) -> models.Flight:
+                         ) -> models.Flight | dict:
 
         response = await self._request(
             url=urllib.parse.urljoin(urls.timetable, f'{flight_id}/'),
@@ -95,4 +95,4 @@ class AsyncSvoApi(BaseSvoAPI):
             ),
             **kwargs
         )
-        return models.Flight.model_validate(response)
+        return models.Flight.model_validate(response) if raw_return is not True else response

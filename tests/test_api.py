@@ -57,6 +57,19 @@ class TestAsyncSvoApi(IsolatedAsyncioTestCase):
 
         self.assertEqual(len(schedule.flights), 10)
 
+    async def test_get_schedule_raw(self):
+        data = {'items': [payload.FlightPayload().model_dump() for _ in range(10)]}
+        self.mock_response.json.return_value = data
+
+        schedule = await self.api.get_schedule(
+            direction='arrival',
+            date_start=datetime.now() - timedelta(hours=4),
+            date_end=datetime.now(),
+            raw_return=True,
+        )
+
+        self.assertListEqual(data['items'], schedule['items'])
+
     async def test_get_schedule_logging(self):
         self.mock_response.json.return_value = models.Schedule.model_construct(
             items=[
@@ -80,3 +93,10 @@ class TestAsyncSvoApi(IsolatedAsyncioTestCase):
 
         self.assertEqual(flight.id, 12345)
 
+    async def test_get_flight_raw(self):
+        response = payload.FlightPayload(i_id='12345').model_dump()
+        self.mock_response.json.return_value = response
+
+        flight = await self.api.get_flight(flight_id=12345, raw_return=True)
+
+        self.assertDictEqual(response, flight)
