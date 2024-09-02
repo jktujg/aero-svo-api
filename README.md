@@ -12,20 +12,19 @@ pip install aero-svo-api
 ```python
 import asyncio
 from datetime import datetime, timedelta
-from aero_svo_api import AsyncSvoApi
+from aero_svo_api import AsyncSvoAPI
 
 
 async def main():
-    async with AsyncSvoApi() as api:
-        schedule = await api.get_schedule(
-            direction='arrival',
-            date_start=datetime.now() - timedelta(hours=2),
-            date_end=datetime.now(),
-            per_page=3,
-            page=1,
-        )
-        print(schedule)
-
+    svo_api = AsyncSvoAPI()
+    schedule = await svo_api.get_schedule(
+        direction='arrival',
+        date_start=datetime.now() - timedelta(hours=2),
+        date_end=datetime.now(),
+        per_page=3,
+        page=1,
+    )
+    print(schedule)
         
 asyncio.run(main())
 ```
