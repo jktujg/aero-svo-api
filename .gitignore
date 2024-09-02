@@ -6,4 +6,5 @@ _[!_]*
 *.swp
 *.ipynb
 *.egg-info*
+.coverage
 

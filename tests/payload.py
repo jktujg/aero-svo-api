@@ -5,23 +5,6 @@ class Payload(BaseModel):
     model_config = ConfigDict(extra='allow')
 
 
-class AircraftPayload(Payload):
-    aircraft_type_id: int = 25
-    aircraft_type_name: str = 'Boeing 777-300ER'
-
-
-class CountryPayload(Payload):
-    region: str = 'NORTH AMERICA'
-    country: str = 'Куба'
-
-
-class CityPayload(Payload):
-    city_eng: str = 'Moscow'
-    city: str = 'Москва'
-    timezone: str = 'DOMESTIC'
-    country: CountryPayload = CountryPayload()
-
-
 class AirportPayload(Payload):
     id: int = 5
     iata: str = 'VRA'

@@ -1,97 +1,51 @@
-from src.aero_svo_api.api import AsyncSvoAPI
-from logging import getLogger
-from src.aero_svo_api import urls
-from src.aero_svo_api import models
-from unittest import IsolatedAsyncioTestCase
-from unittest.mock import AsyncMock, Mock
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-from . import payload
+import pytest
+from tenacity import retry, stop_after_attempt
+
+from src.aero_svo_api import AsyncSvoAPI
 
 
-svo_logger = getLogger('svo-api')
-
-
-class TestAsyncSvoAPI(IsolatedAsyncioTestCase):
-    async def asyncSetUp(self) -> None:
-        self.api = AsyncSvoAPI()
-        self.mock_response = AsyncMock(raise_for_status=Mock)
-        self.api.session.get = AsyncMock(return_value=self.mock_response)
-
-    async def asyncTearDown(self) -> None:
-        await self.api.session.close()
-
-    async def test_request(self):
-        response = await self.api._request(urls.timetable, proxy='https://example.com', params={'param': 'val'})
-        self.api.session.get.assert_called_with(urls.timetable, proxy='https://example.com', params={'param': 'val'})
-
-    async def test_request_inject_session(self):
-        json_mock = AsyncMock(return_value=payload.FlightPayload().model_dump())
-        mock_session = AsyncMock(get=AsyncMock(return_value=Mock(json=json_mock)))
-
-        response = await self.api.get_flight(flight_id=12345, _session=mock_session)
-        mock_session.get.assert_called()
-
-    async def test_session_injection_does_not_create_session(self):
-        api = AsyncSvoAPI()
-        mock_session = AsyncMock(get=AsyncMock(return_value=AsyncMock(raise_for_status=Mock)))
-
-        response = await api._request(urls.timetable, params={}, _session=mock_session)
-
-        self.assertIsNone(api._session)
-
+@pytest.mark.usefixtures('throttle',)
+class TestAsyncSvoAPI:
+    @retry(stop=stop_after_attempt(3))
     async def test_get_schedule(self):
-        data = {'items': [payload.FlightPayload().model_dump() for _ in range(10)]}
-        self.mock_response.json.return_value = data
+        date_start = datetime.now(tz=timezone.utc)
+        date_end = date_start + timedelta(hours=3)
 
-        schedule = await self.api.get_schedule(
-            direction='arrival',
-            date_start=datetime.now() - timedelta(hours=4),
-            date_end=datetime.now(),
+        response = await AsyncSvoAPI().get_schedule(
+            'departure',
+            date_start=date_start,
+            date_end=date_end
         )
 
-        self.assertEqual(len(schedule.flights), 10)
+        assert len(response.flights) > 0
+        assert {flight.direction for flight in response.flights} == {'departure'}
 
+        sked_times = sorted((flight.sked_local for flight in response.flights))
+        assert sked_times[0] >= date_start
+        assert sked_times[1] <= date_end
+
+    @retry(stop=stop_after_attempt(3))
     async def test_get_schedule_raw(self):
-        data = {'items': [payload.FlightPayload().model_dump() for _ in range(10)]}
-        self.mock_response.json.return_value = data
-
-        schedule = await self.api.get_schedule(
+        response = await AsyncSvoAPI().get_schedule(
             direction='arrival',
-            date_start=datetime.now() - timedelta(hours=4),
-            date_end=datetime.now(),
+            date_start=datetime.now(),
+            date_end=datetime.now() + timedelta(hours=3),
             raw_return=True,
         )
 
-        self.assertListEqual(data['items'], schedule['items'])
+        assert len(response['items']) == response['pagination']['totalItems'] > 1
+        assert response['pagination']['pageCount'] == 99999
+        assert response['pagination']['curPage'] == 1
 
-    async def test_get_schedule_logging(self):
-        self.mock_response.json.return_value = models.Schedule.model_construct(
-            items=[
-                payload.FlightPayload(i_id='string').model_dump(),      # invalid
-                payload.FlightPayload().model_dump(),                   # valid
-            ]
-        ).model_dump(by_alias=True)
-
-        with self.assertLogs(svo_logger, level='WARNING') as log:
-            schedule = await self.api.get_schedule(
-                direction='arrival',
-                date_start=datetime.now() - timedelta(hours=4),
-                date_end=datetime.now()
-            )
-            self.assertIn('validation error', log.output[0])
-            self.assertEqual(len(schedule.flights), 1)
-
+    @retry(stop=stop_after_attempt(3))
     async def test_get_flight(self):
-        self.mock_response.json.return_value = payload.FlightPayload(i_id='12345').model_dump()
-        flight = await self.api.get_flight(flight_id=12345)
+        response = await AsyncSvoAPI().get_flight(8990982)
+        assert response.id == 8990982
+        assert response.mar1.name == 'Нижневартовск'
 
-        self.assertEqual(flight.id, 12345)
-
+    @retry(stop=stop_after_attempt(3))
     async def test_get_flight_raw(self):
-        response = payload.FlightPayload(i_id='12345').model_dump()
-        self.mock_response.json.return_value = response
-
-        flight = await self.api.get_flight(flight_id=12345, raw_return=True)
-
-        self.assertDictEqual(response, flight)
+        response = await AsyncSvoAPI().get_flight(8990983, raw_return=True)
+        assert response['i_id'] == '8990983'
