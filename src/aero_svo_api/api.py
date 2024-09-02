@@ -1,15 +1,11 @@
-import urllib.parse
 from typing import Literal, Any
 from aiohttp import ClientSession
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from functools import cached_property
 
-from . import (
-    urls,
-    models,
-    utils,
-)
+from . import models
+from .urls import URL
 
 
 class BaseSvoAPI(metaclass=ABCMeta):
@@ -63,7 +59,7 @@ class AsyncSvoAPI(BaseSvoAPI):
                            ) -> models.Schedule | dict:
 
         response = await self._request(
-            url=urls.timetable,
+            url=URL.TIMETABLE,
             params=dict(
                 direction=direction,
                 dateStart=utils.format_date(date_start),
@@ -84,7 +80,7 @@ class AsyncSvoAPI(BaseSvoAPI):
                          ) -> models.Flight | dict:
 
         response = await self._request(
-            url=urllib.parse.urljoin(urls.timetable, f'{flight_id}/'),
+            url=URL.FLIGHT.format(flight_id=flight_id),
             params=dict(
                 locale=locale,
             ),

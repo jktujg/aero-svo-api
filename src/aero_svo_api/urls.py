@@ -1,3 +1,6 @@
+from enum import StrEnum
 
 
-timetable = 'https://www.svo.aero/bitrix/timetable/'
+class URL(StrEnum):
+    TIMETABLE = 'https://www.svo.aero/bitrix/timetable/'
+    FLIGHT = 'https://www.svo.aero/bitrix/timetable/{flight_id}/'
