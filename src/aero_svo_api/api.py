@@ -62,8 +62,8 @@ class AsyncSvoAPI(BaseSvoAPI):
             url=URL.TIMETABLE,
             params=dict(
                 direction=direction,
-                dateStart=utils.format_date(date_start),
-                dateEnd=utils.format_date(date_end),
+                dateStart=date_start.isoformat(timespec='seconds'),
+                dateEnd=date_end.isoformat(timespec='seconds'),
                 perPage=per_page,
                 page=page,
                 locale=locale,
