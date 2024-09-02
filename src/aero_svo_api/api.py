@@ -35,7 +35,8 @@ class BaseSvoAPI(metaclass=ABCMeta):
         ...
 
 
-class AsyncSvoApi(BaseSvoAPI):
+
+class AsyncSvoAPI(BaseSvoAPI):
     def __init__(self, session: ClientSession | None = None) -> None:
         self._session = session
 

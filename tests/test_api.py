@@ -1,4 +1,4 @@
-from src.aero_svo_api.api import AsyncSvoApi
+from src.aero_svo_api.api import AsyncSvoAPI
 from logging import getLogger
 from src.aero_svo_api import urls
 from src.aero_svo_api import models
@@ -12,9 +12,9 @@ from . import payload
 svo_logger = getLogger('svo-api')
 
 
-class TestAsyncSvoApi(IsolatedAsyncioTestCase):
+class TestAsyncSvoAPI(IsolatedAsyncioTestCase):
     async def asyncSetUp(self) -> None:
-        self.api = AsyncSvoApi()
+        self.api = AsyncSvoAPI()
         self.mock_response = AsyncMock(raise_for_status=Mock)
         self.api.session.get = AsyncMock(return_value=self.mock_response)
 
@@ -33,7 +33,7 @@ class TestAsyncSvoApi(IsolatedAsyncioTestCase):
         mock_session.get.assert_called()
 
     async def test_session_injection_does_not_create_session(self):
-        api = AsyncSvoApi()
+        api = AsyncSvoAPI()
         mock_session = AsyncMock(get=AsyncMock(return_value=AsyncMock(raise_for_status=Mock)))
 
         response = await api._request(urls.timetable, params={}, _session=mock_session)

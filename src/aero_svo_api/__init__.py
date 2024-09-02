@@ -1,4 +1,4 @@
-from .api import AsyncSvoApi
+from .api import AsyncSvoAPI
 
-__all__ = (AsyncSvoApi,)
+__all__ = (AsyncSvoAPI,)
 __version__ = '0.1.3'
