@@ -8,43 +8,10 @@ from . import models
 from .urls import URL
 
 
-class BaseSvoAPI(metaclass=ABCMeta):
+class BaseAsyncSvoAPI(metaclass=ABCMeta):
     @abstractmethod
-    def get_schedule(self,
-                     direction: Literal['arrival', 'departure'],
-                     date_start: datetime,
-                     date_end: datetime,
-                     per_page: int = 99999,
-                     page: int = 0,
-                     locale: str = 'ru',
-                     raw_return: bool = False,
-                     **kwargs) -> models.Schedule | dict:
-        ...
-
-    @abstractmethod
-    def get_flight(self,
-                   flight_id: int,
-                   locale: str = 'ru',
-                   raw_return: bool = False,
-                   **kwargs,
-                   ) -> models.Flight | dict:
-        ...
-
-
-class AsyncSvoAPI(BaseSvoAPI):
-    def __init__(self, session: ClientSession | None = None) -> None:
-        self._session = session
-
-    @cached_property
-    def session(self):
-        if self._session is None:
-            self._session = ClientSession()
-        return self._session
-
     async def _request(self, url: str, params: dict, **kwargs: Any) -> dict:
-        response = await self.session.get(url, params=params, **kwargs)
-        response.raise_for_status()
-        return await response.json()
+        ...
 
     async def get_schedule(self,
                            direction: Literal['arrival', 'departure'],
@@ -86,3 +53,19 @@ class AsyncSvoAPI(BaseSvoAPI):
             **kwargs
         )
         return models.Flight.model_validate(response) if raw_return is not True else response
+
+
+class AsyncSvoAPI(BaseAsyncSvoAPI):
+    def __init__(self, session: ClientSession | None = None) -> None:
+        self._session = session
+
+    @cached_property
+    def session(self):
+        if self._session is None:
+            self._session = ClientSession()
+        return self._session
+
+    async def _request(self, url: str, params: dict, **kwargs: Any) -> dict:
+        response = await self.session.get(url, params=params, **kwargs)
+        response.raise_for_status()
+        return await response.json()
