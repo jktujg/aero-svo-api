@@ -24,7 +24,7 @@ class BaseSvoAPI(metaclass=ABCMeta):
                            raw_return: bool = False,
                            **kwargs
                            ) -> models.Schedule | dict:
-
+        """ List of flights for arrival/departure direction in a time range """
         response = self._request(
             url=URL.TIMETABLE,
             params=dict(
@@ -45,7 +45,7 @@ class BaseSvoAPI(metaclass=ABCMeta):
                          raw_return: bool = False,
                          **kwargs
                          ) -> models.Flight | dict:
-
+        """ Current flight details by its ID """
         response = self._request(
             url=URL.FLIGHT.format(flight_id=flight_id),
             params=dict(
