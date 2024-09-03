@@ -1,30 +1,37 @@
 # aero-svo-api  
-Unoficial API wrapper for Sheremetyevo International Airport [svo.aero](https://www.svo.aero/ru/main)
-* Asynchronous usage
+Unofficial Sheremetyevo International Airport [website](https://www.svo.aero/ru/main) API wrapper 
+
+* Sync/Async usage
 * Pydantic models as a result
 
-## Install
+
+## Installation
 ```commandline
 pip install aero-svo-api
 ```
-## Basic Usage
-### Example
+## Available methods
+* `get_schedule`  - List of flights for arrival/departure direction in a time range 
+* `get_flight`    - Current flight details by its ID 
+
+## Usage example
+
+
 ```python
-import asyncio
 from datetime import datetime, timedelta
-from aero_svo_api import AsyncSvoAPI
+from aero_svo_api import SvoAPI
 
+# each *API instance creates own session with first request if session not provided in constructor
+# by default: request.Session for SvoAPI and aiohttp.ClientSession for AsyncSvoAPI
 
-async def main():
-    svo_api = AsyncSvoAPI()
-    schedule = await svo_api.get_schedule(
-        direction='arrival',
-        date_start=datetime.now() - timedelta(hours=2),
-        date_end=datetime.now(),
-        per_page=3,
-        page=1,
-    )
-    print(schedule)
-        
-asyncio.run(main())
+svo_api = SvoAPI()
+
+schedule = svo_api.get_schedule(
+    direction='departure',
+    date_start=datetime.now(),
+    date_end=datetime.now() + timedelta(hours=3),
+    # additional parameters (e.g. headers, cookies, ...) forwards to session request
+    headers={'User-Agent': 'Custom user-agent'}
+)
 ```
+
+
