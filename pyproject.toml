@@ -27,3 +27,4 @@ version = {attr = 'aero_svo_api.__version__'}
 [project.urls]
 "Homepage"= "https://github.com/jktujg/aero-svo-api"
 "Bug Tracker" = "https://github.com/jktujg/aero-svo-api/issues"
+"Changelog" = "https://github.com/jktujg/aero-svo-api/blob/main/CHANGELOG.md"
