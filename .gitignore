@@ -1,9 +1,10 @@
 .idea/
 dist/
-*~*
+build/
 __pycache__
 _[!_]*
-*.swp
 *.egg-info*
+*.swp
+*~*
 .coverage
 
